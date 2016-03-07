@@ -5,7 +5,7 @@ close all
 %% target
 % parameter initialization
 T = 0.1;
-nSteps = 50;
+nSteps = 100;
 nStates = 2;
 x_tgt_init = [3; 2];
 x_tgt = zeros(nSteps, nStates);
@@ -96,6 +96,8 @@ for i = 1 : nSteps
     % channel filter (consensus step 2)
     nConsensus = 5;
     for j = 1 : nConsensus
+        x_fltr_backup = x_fltr;
+        P_fltr_backup = P_fltr;
         for k = 1 : nSensors
             for l = 1 : nSensors
                 if cm(l, k) == 1
@@ -106,10 +108,10 @@ for i = 1 : nSteps
                         x_p = F * x_fltr{i - 1, l};
                         P_p = F * P_fltr{i - 1, l} * F' + Q;
                     end
-                    x_1 = x_fltr{i, k};
-                    P_1 = P_fltr{i, k};
-                    x_2 = x_fltr{i, l};
-                    P_2 = P_fltr{i, l};
+                    x_1 = x_fltr_backup{i, k};
+                    P_1 = P_fltr_backup{i, k};
+                    x_2 = x_fltr_backup{i, l};
+                    P_2 = P_fltr_backup{i, l};
                     [x_CF, P_CF] = chnl_fltr(x_p, P_p, x_1, P_1, x_2, P_2);
                     % archive
                     x_fltr{i, k} = x_CF;
@@ -139,5 +141,5 @@ for i = 1 : nSensors
     str = sprintf('local estimation from sensor %d', i);
     legend('target', str)
 end
-bg = biograph(cm);
-view(bg)
+% bg = biograph(cm);
+% view(bg)
